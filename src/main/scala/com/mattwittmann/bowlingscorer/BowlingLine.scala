@@ -1,5 +1,9 @@
 package com.mattwittmann.bowlingscorer
 
+/**
+  * A line, or a game, of ten-pin bowling.
+  * See [[http://codingdojo.org/kata/Bowling/ Coding Dojo Bowling Kata]].
+  */
 object BowlingLine {
   private[this] val TotalFrames = 10
   private[this] val LastFrame = 9
@@ -75,6 +79,19 @@ object BowlingLine {
     }
   }
 
+  /**
+    * Scores a line of bowling.
+    *
+    * A line of bowling should follow this format:
+    *
+    * - `1-9` for a roll hitting one to nine pins
+    * - `-` A hyphen represents a miss or zero pins hit in the roll
+    * - `/` represents a spare, representing knocking down all remaining pins on the second roll of the frame
+    * - `X` represents a strike, knocking down all ten pins on the first roll of a frame
+    *
+    * @param line The line of bowling in a particular format
+    * @return The final score for the given line of bowling
+    */
   def score(line: String): Score = {
     line.foldLeft[State](State()) { (lastState, roll) =>
       val (nextFrame, nextRoll) = calculateNextFrameAndRoll(lastState, roll)
