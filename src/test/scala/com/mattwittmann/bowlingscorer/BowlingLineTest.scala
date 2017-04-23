@@ -10,27 +10,27 @@ class BowlingLineTest extends WordSpec {
   "A BowlingLine" when {
     "supplied a line of rolls XXXXXXXXXXXX" should {
       "yield a score of 300" in {
-        assert(300 === BowlingLine.score("XXXXXXXXXXXX"))
+        assert(BowlingLine.score("XXXXXXXXXXXX") === 300)
       }
     }
     "supplied a line of rolls 9-9-9-9-9-9-9-9-9-9-" should {
       "yield a score of 90" in {
-        assert(90 === BowlingLine.score("9-9-9-9-9-9-9-9-9-9-"))
+        assert(BowlingLine.score("9-9-9-9-9-9-9-9-9-9-") === 90)
       }
     }
     "supplied a line of rolls 5/5/5/5/5/5/5/5/5/5/5" should {
       "yield a score of 150" in {
-        assert(150 === BowlingLine.score("5/5/5/5/5/5/5/5/5/5/5"))
+        assert(BowlingLine.score("5/5/5/5/5/5/5/5/5/5/5") === 150)
       }
     }
     "supplied a line of rolls --------------------" should {
       "yield a score of 0" in {
-        assert(0 === BowlingLine.score("--------------------"))
+        assert(BowlingLine.score("--------------------") === 0)
       }
     }
     "supplied a line of rolls 44444444444444444444" should {
       "yield a score of 80" in {
-        assert(80 === BowlingLine.score("44444444444444444444"))
+        assert(BowlingLine.score("44444444444444444444") === 80)
       }
     }
   }
