@@ -28,5 +28,10 @@ class BowlingLineTest extends WordSpec {
         assert(0 === BowlingLine.score("--------------------"))
       }
     }
+    "supplied a line of rolls 44444444444444444444" should {
+      "yield a score of 80" in {
+        assert(80 === BowlingLine.score("44444444444444444444"))
+      }
+    }
   }
 }
