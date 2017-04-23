@@ -22,10 +22,7 @@ object BowlingLine {
       val currentFrame = lastState.currentFrame
       val lastCurrentFrameScore = lastState.frames(currentFrame)
       val (pinsKnockedDown, currentFrameScore) = roll match {
-        case 'X' => lastState.roll match {
-          case _: BonusRoll => (10, lastCurrentFrameScore + 10)
-          case _ => (10, 10)
-        }
+        case 'X' => (10, lastCurrentFrameScore + 10)
         case '/' => (10 - lastCurrentFrameScore, 10)
         case '-' => (0, lastCurrentFrameScore)
         case digit => {
