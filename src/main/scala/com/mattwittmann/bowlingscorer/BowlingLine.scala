@@ -34,9 +34,7 @@ object BowlingLine {
       val (nextFrame, nextRoll) =
         if ('X' == roll && currentFrame == LastFrame && lastState.roll == FirstRoll)
           (LastFrame, FirstBonusRoll)
-        else if ('/' == roll && currentFrame == LastFrame && lastState.roll == SecondRoll)
-          (LastFrame, LastBonusRoll)
-        else if (lastState.roll == FirstBonusRoll)
+        else if (lastState.roll == FirstBonusRoll || ('/' == roll && currentFrame == LastFrame && lastState.roll == SecondRoll))
           (LastFrame, LastBonusRoll)
         else if (lastState.roll == LastBonusRoll)
           (LastFrame, Over)
