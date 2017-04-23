@@ -1,0 +1,7 @@
+# For sbt
+target/
+
+# For IntelliJ IDEA
+/.idea/
+*.iml
+/out/
