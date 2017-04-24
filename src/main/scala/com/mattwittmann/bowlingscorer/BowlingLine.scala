@@ -7,30 +7,49 @@ package com.mattwittmann.bowlingscorer
 object BowlingLine {
   private[this] val TotalFrames = 10
   private[this] val LastFrame = 9
+  private[this] val DecimalRadix = 10
   type Score = Int
   type BowlingLine = Seq[Score]
   type Bonuses = (List[Int], List[Int])
-  sealed class Roll
-  object FirstRoll extends Roll
-  object SecondRoll extends Roll
-  object Over extends Roll
-  abstract class BonusRoll extends Roll
-  object LastBonusRoll extends BonusRoll
-  object FirstBonusRoll extends BonusRoll
+  sealed trait Roll
+  case object FirstRoll extends Roll
+  case object SecondRoll extends Roll
+  case object Over extends Roll
+  trait BonusRoll extends Roll
+  case object LastBonusRoll extends BonusRoll
+  case object FirstBonusRoll extends BonusRoll
+  sealed trait InputError
+  case class InvalidInputCharacter(character: Char) extends InputError
+  case object TooManyPins extends InputError
+  case object TooManyFrames extends InputError
   private[this] val UnplayedFrames = Array.fill[Score](TotalFrames)(0)
   private[this] val NoBonuses = (Nil, Nil)
   case class State(currentFrame: Int = 0, roll: Roll = FirstRoll, bonuses: Bonuses = NoBonuses, frames: BowlingLine = UnplayedFrames)
 
-  private[this] def calculatePinsKnockedDownAndCurrentFrameScore(lastState: State, roll: Char): (Int, Score) = {
+  private[this] def isBonusRoll(lastState: State) = List(FirstBonusRoll, LastBonusRoll).contains(lastState.roll)
+
+  private[this] def calculatePinsKnockedDownAndCurrentFrameScore(lastState: State, roll: Char): Either[InputError, (Int, Score)] = {
     val lastCurrentFrameScore = lastState.frames(lastState.currentFrame)
 
     roll match {
-      case 'X' => (10, lastCurrentFrameScore + 10)
-      case '/' => (10 - lastCurrentFrameScore, 10)
-      case '-' => (0, lastCurrentFrameScore)
+      case 'X' => Right((10, lastCurrentFrameScore + 10))
+      case '/' => Right((10 - lastCurrentFrameScore, 10))
+      case '-' => Right((0, lastCurrentFrameScore))
       case digit => {
-        val convertedDigit = digit.asDigit
-        (convertedDigit, lastCurrentFrameScore + convertedDigit)
+        val convertedDigit = Character.digit(digit, DecimalRadix)
+
+        if (convertedDigit < 1)
+          Left(InvalidInputCharacter(digit))
+        else {
+
+          val currentFrameScore = lastCurrentFrameScore + convertedDigit
+
+          if ((isBonusRoll(lastState) && currentFrameScore > 30) ||
+            (!isBonusRoll(lastState) && currentFrameScore > 9))
+            Left(TooManyPins)
+          else
+            Right((convertedDigit, currentFrameScore))
+        }
       }
     }
   }
@@ -64,18 +83,19 @@ object BowlingLine {
       (lastState.bonuses._2, Nil)
   }
 
-  private[this] def calculateNextFrames(lastState: State, roll: Char): BowlingLine = {
-    val (pinsKnockedDown, currentFrameScore) = calculatePinsKnockedDownAndCurrentFrameScore(lastState, roll)
-
-    lastState.frames.zipWithIndex.map {
-      case (score, index) => {
-        if (index == lastState.currentFrame)
-          currentFrameScore
-        else if (lastState.bonuses._1.contains(index))
-          score + pinsKnockedDown
-        else
-          score
-      }
+  private[this] def calculateNextFrames(lastState: State, roll: Char): Either[InputError, BowlingLine] = {
+    calculatePinsKnockedDownAndCurrentFrameScore(lastState, roll).map {
+      case (pinsKnockedDown, currentFrameScore) =>
+        lastState.frames.zipWithIndex.map {
+          case (score, index) => {
+            if (index == lastState.currentFrame)
+              currentFrameScore
+            else if (lastState.bonuses._1.contains(index))
+              score + pinsKnockedDown
+            else
+              score
+          }
+        }
     }
   }
 
@@ -92,13 +112,19 @@ object BowlingLine {
     * @param line The line of bowling in a particular format
     * @return The final score for the given line of bowling
     */
-  def score(line: String): Score = {
-    line.foldLeft[State](State()) { (lastState, roll) =>
-      val (nextFrame, nextRoll) = calculateNextFrameAndRoll(lastState, roll)
-      val nextBonuses = calculateNextBonuses(lastState, roll)
-      val nextFrames = calculateNextFrames(lastState, roll)
-
-      State(nextFrame, nextRoll, nextBonuses, nextFrames)
-    }.frames.sum
+  def score(line: String): Either[InputError, Score] = {
+    line.foldLeft[Either[InputError, State]](Right(State())) { (eitherLastState, roll) =>
+      eitherLastState.flatMap { lastState =>
+        if (lastState.roll == Over)
+          Left(TooManyFrames)
+        else {
+          val (nextFrame, nextRoll) = calculateNextFrameAndRoll(lastState, roll)
+          val nextBonuses = calculateNextBonuses(lastState, roll)
+          calculateNextFrames(lastState, roll).map { nextFrames =>
+            State(nextFrame, nextRoll, nextBonuses, nextFrames)
+          }
+        }
+      }
+    }.map(_.frames.sum)
   }
 }
