@@ -53,5 +53,10 @@ class BowlingLineTest extends WordSpec {
         assert(BowlingLine.score("XXXXXXXXXXXXX") === Left(BowlingLine.TooManyFrames))
       }
     }
+    "supplied a line of rolls 4A444444444444444444" should {
+      "yield an error of InvalidInputCharacter('A')" in {
+        assert(BowlingLine.score("4A444444444444444444") === Left(BowlingLine.InvalidInputCharacter('A')))
+      }
+    }
   }
 }
