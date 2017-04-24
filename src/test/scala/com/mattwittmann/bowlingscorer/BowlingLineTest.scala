@@ -60,17 +60,22 @@ class BowlingLineTest extends WordSpec {
     }
     "supplied a line of rolls 4444444444" should {
       "yield an error of IncompleteGame" in {
-        assert(BowlingLine.score("4444444444") === Left(BowlingLine.IncompleteGame))
+        assert(BowlingLine.score("4444444444") === Left(BowlingLine.IncompleteGame(5, 40)))
+      }
+    }
+    "supplied a line of rolls 44444444444" should {
+      "yield an error of IncompleteGame" in {
+        assert(BowlingLine.score("44444444444") === Left(BowlingLine.IncompleteGame(5, 40)))
       }
     }
     "supplied a line of rolls XXXXXXXXXXXX" should {
       "yield an error of IncompleteGame" in {
-        assert(BowlingLine.score("XXXXXXXXXXX") === Left(BowlingLine.IncompleteGame))
+        assert(BowlingLine.score("XXXXXXXXXXX") === Left(BowlingLine.IncompleteGame(9, 270)))
       }
     }
     "supplied a line of rolls XXXXXXXXXXX" should {
       "yield an error of IncompleteGame" in {
-        assert(BowlingLine.score("XXXXXXXXXX") === Left(BowlingLine.IncompleteGame))
+        assert(BowlingLine.score("XXXXXXXXXX") === Left(BowlingLine.IncompleteGame(9, 260)))
       }
     }
   }

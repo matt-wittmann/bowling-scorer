@@ -22,7 +22,7 @@ object BowlingLine {
   case class InvalidInputCharacter(character: Char) extends InputError
   case object TooManyPins extends InputError
   case object TooManyFrames extends InputError
-  case object IncompleteGame extends InputError
+  case class IncompleteGame(framesCompleted: Int, score: Score) extends InputError
   private[this] val UnplayedFrames = Array.fill[Score](TotalFrames)(0)
   private[this] val NoBonuses = (Nil, Nil)
   case class State(currentFrame: Int = 0, roll: Roll = FirstRoll, bonuses: Bonuses = NoBonuses, frames: BowlingLine = UnplayedFrames)
@@ -130,7 +130,7 @@ object BowlingLine {
       if (state.roll == Over)
         Right(state)
       else
-        Left(IncompleteGame)
+        Left(IncompleteGame(state.currentFrame, state.frames.take(state.currentFrame).sum))
     }.map(_.frames.sum)
   }
 }
