@@ -58,5 +58,10 @@ class BowlingLineTest extends WordSpec {
         assert(BowlingLine.score("4A444444444444444444") === Left(BowlingLine.InvalidInputCharacter('A')))
       }
     }
+    "supplied a line of rolls 4444444444" should {
+      "yield an error of IncompleteGame" in {
+        assert(BowlingLine.score("4444444444") === Left(BowlingLine.IncompleteGame))
+      }
+    }
   }
 }
