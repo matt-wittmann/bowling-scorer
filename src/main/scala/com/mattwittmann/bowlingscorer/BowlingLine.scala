@@ -127,7 +127,7 @@ object BowlingLine {
         }
       }
     }.flatMap { state =>
-      if (state.currentFrame == 9)
+      if (state.roll == Over)
         Right(state)
       else
         Left(IncompleteGame)
