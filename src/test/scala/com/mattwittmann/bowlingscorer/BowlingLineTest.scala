@@ -78,5 +78,15 @@ class BowlingLineTest extends WordSpec {
         assert(BowlingLine.score("XXXXXXXXXX") === Left(BowlingLine.IncompleteGame(9, 260)))
       }
     }
+    "supplied an empty line" should {
+      "yield an error of IncompleteGame" in {
+        assert(BowlingLine.score("") === Left(BowlingLine.IncompleteGame(0, 0)))
+      }
+    }
+    "supplied a null line" should {
+      "yield an error of IncompleteGame" in {
+        assert(BowlingLine.score(null) === Left(BowlingLine.IncompleteGame(0, 0)))
+      }
+    }
   }
 }

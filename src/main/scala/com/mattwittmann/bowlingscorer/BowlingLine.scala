@@ -114,6 +114,9 @@ object BowlingLine {
     * @return The final score for the given line of bowling
     */
   def score(line: String): Either[InputError, Score] = {
+    if (line == null)
+      return Left(IncompleteGame(0, 0))
+
     line.foldLeft[Either[InputError, State]](Right(State())) { (eitherLastState, roll) =>
       eitherLastState.flatMap { lastState =>
         if (lastState.roll == Over)
